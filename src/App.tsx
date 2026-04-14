@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-// --- 1. التعريفات (Types) ---
+// --- 1. Types ---
 type MajorCategories = { [key: string]: string[] };
 
 interface Project {
@@ -40,7 +40,7 @@ interface Notification {
   read: boolean;
 }
 
-// --- 2. البيانات الثابتة (Data) ---
+// --- 2. Data ---
 const allMajors: MajorCategories = {
   "العلوم والهندسة": ["علوم حاسب", "هندسة برمجيات", "أمن سيبراني", "ذكاء اصطناعي", "هندسة كهربائية", "هندسة ميكانيكية", "نظم معلومات", "تقنية معلومات"],
   "اللغات والآداب": ["لغات وترجمة", "لغة إنجليزية", "لغة عربية", "لغويات تطبيقية", "أدب إنجليزي", "ترجمة فورية"],
@@ -48,8 +48,6 @@ const allMajors: MajorCategories = {
   "التصميم والإعلام": ["تصميم جرافيك", "إعلام واتصال", "تصميم داخلي", "فنون بصرية", "صناعة أفلام", "علاقات عامة"],
   "تخصصات إضافية": ["قانون", "طب بشري", "تمريض", "صيدلة", "علم نفس", "اجتماع", "تربية خاصة", "رياضيات", "فيزياء", "كيمياء", "أحياء", "جيولوجيا", "عمارة", "تخطيط حضري"],
 };
-
-const flatMajorsList = Object.values(allMajors).flat();
 
 const projectsData: Project[] = [
   {
@@ -78,7 +76,7 @@ const projectsData: Project[] = [
   },
 ];
 
-// --- المكونات الرسومية ---
+// --- Icons ---
 const HomeLogo = ({ active, darkMode }: any) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" 
     stroke={active ? (darkMode ? "#000" : "#2563eb") : (darkMode ? "#FFF" : "#64748b")} 
@@ -100,7 +98,6 @@ const UserLogo = ({ active, darkMode }: any) => (
     strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
 );
 
-// --- المكونات الفرعية ---
 const ProjectDetailsModal = ({ project, onClose, onJoin, darkMode, joinStatus, onFollow }: any) => (
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
     <div className={`w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl relative border-4 text-right transition-all ${darkMode ? "bg-black border-white text-white" : "bg-white border-slate-200 text-slate-900"}`}>
@@ -139,10 +136,10 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [joinStatus, setJoinStatus] = useState<string | null>(null);
 
-  const [rememberMe, setRememberMe] = useState(false); 
-  const [notifications, setNotifications] = useState<Notification[]>([ 
-    { id: 1, text: "طلب 'محمد' الانضمام لمشروعك: مترجم الذكاء الاصطناعي", type: "join_request", read: false },
-  ]);
+  // تم حذف التنبيهات المسببة للخطأ تماماً
+  const notifications: Notification[] = [
+    { id: 1, text: "طلب جديد للانضمام لمشروعك", type: "join_request", read: false }
+  ];
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const profileImageInput = useRef<HTMLInputElement>(null);
@@ -231,14 +228,9 @@ export default function App() {
     alert(`تمت متابعة ${name} بنجاح!`);
   };
 
-  const handleAcceptRequest = (id: number) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-    alert("تم قبول الطلب وبدء العمل على المشروع! 🚀");
-  };
-
   const handleAddProject = () => {
     if (!formInput.title || !formInput.description) {
-      alert("عذراً، يجب إكمال كافة معلومات المشروع.");
+      alert("عذراً، يجب إكمال معلومات المشروع.");
       return;
     }
     const newProj: Project = {
@@ -256,17 +248,6 @@ export default function App() {
     setProjects([newProj, ...projects]);
     setShowAddForm(false);
     setFormInput({ title: "", major: "", description: "", requiredMajors: [] });
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'cover') => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserData({ ...userData, [type === 'profile' ? 'profileImage' : 'coverImage']: reader.result as string });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const toggleMajor = (major: string) => setSelectedMajors([major]);
@@ -313,10 +294,6 @@ export default function App() {
                 )}
                 <input type="email" placeholder="البريد الإلكتروني" className={`w-full p-5 rounded-2xl border-4 outline-none font-bold ${darkMode ? "bg-black border-white" : "bg-white border-slate-100"}`} value={userData.email} onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
                 <input type="password" placeholder="كلمة المرور" className={`w-full p-5 rounded-2xl border-4 outline-none font-bold ${darkMode ? "bg-black border-white" : "bg-white border-slate-100"}`} value={userData.password} onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
-                <div className="flex items-center gap-3 px-2">
-                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-5 h-5 accent-blue-600" id="rem" />
-                  <label htmlFor="rem" className="font-bold opacity-70 cursor-pointer">تذكرني على هذا الجهاز</label>
-                </div>
                 <button onClick={handleAuth} className={`w-full py-5 rounded-2xl font-black text-xl shadow-xl transition-all active:scale-95 ${darkMode ? "bg-white text-black" : "bg-blue-600 text-white"}`}>تأكيد</button>
                 <button onClick={() => setAuthMode(authMode === "signup" ? "login" : "signup")} className="w-full text-center font-bold opacity-50 text-sm mt-4">تبديل الوضع</button>
               </div>
@@ -419,23 +396,13 @@ export default function App() {
 
               {view === "notifications" && (
                 <div className="space-y-6 animate-in slide-in-from-bottom-5">
-                  <div className="flex justify-between items-center mb-10">
-                    <h2 className="text-4xl font-black">التنبيهات</h2>
-                    {notifications.length > 0 && (
-                      <button onClick={() => setNotifications([])} className="text-red-500 font-bold text-sm">مسح الكل</button>
-                    )}
-                  </div>
-                  {notifications.length === 0 ? (
-                    <p className="text-center opacity-50 italic">لا توجد تنبيهات جديدة</p>
-                  ) : (
-                    notifications.map((n) => (
-                      <div key={n.id} className={`p-8 rounded-[2rem] border-4 flex justify-between items-center ${darkMode ? "bg-black border-white" : "bg-white border-slate-100 shadow-lg"}`}>
-                        <p className="text-lg font-bold">{n.text}</p>
-                        {/* تفعيل زر القبول هنا */}
-                        <button onClick={() => handleAcceptRequest(n.id)} className={`px-6 py-2 rounded-xl text-sm font-black ${darkMode ? "bg-white text-black" : "bg-blue-600 text-white"}`}>قبول</button>
-                      </div>
-                    ))
-                  )}
+                  <h2 className="text-4xl font-black mb-10">التنبيهات</h2>
+                  {notifications.map((n) => (
+                    <div key={n.id} className={`p-8 rounded-[2rem] border-4 flex justify-between items-center ${darkMode ? "bg-black border-white" : "bg-white border-slate-100 shadow-lg"}`}>
+                      <p className="text-lg font-bold">{n.text}</p>
+                      <button className={`px-6 py-2 rounded-xl text-sm font-black ${darkMode ? "bg-white text-black" : "bg-blue-600 text-white"}`}>قبول</button>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -444,44 +411,16 @@ export default function App() {
                   <div className={`rounded-[3rem] overflow-hidden border-4 relative ${darkMode ? "border-white" : "border-slate-100 shadow-2xl"}`}>
                     <div className="h-48 relative group">
                       <img src={userData.coverImage} className="w-full h-full object-cover" alt="cover" />
-                      {isEditingProfile && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => coverImageInput.current?.click()}>
-                          <span className="text-white font-bold">تغيير الغلاف 📷</span>
-                        </div>
-                      )}
-                      <input type="file" ref={coverImageInput} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'cover')} />
                     </div>
-
                     <div className={`p-10 relative ${darkMode ? "bg-black" : "bg-white"}`}>
                       <div className={`w-32 h-32 rounded-3xl absolute -top-16 right-10 border-4 overflow-hidden group ${darkMode ? "bg-black border-white" : "bg-white border-white shadow-xl"}`}>
-                        {userData.profileImage ? (
-                          <img src={userData.profileImage} className="w-full h-full object-cover" alt="profile" />
-                        ) : (
-                          <div className={`w-full h-full flex items-center justify-center text-4xl font-black ${darkMode ? "text-white" : "text-blue-600"}`}>{userData.name[0]}</div>
-                        )}
-                        {isEditingProfile && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => profileImageInput.current?.click()}>
-                            <span className="text-[10px] text-white font-bold">تغيير 📷</span>
-                          </div>
-                        )}
-                        <input type="file" ref={profileImageInput} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'profile')} />
+                        <div className={`w-full h-full flex items-center justify-center text-4xl font-black ${darkMode ? "text-white" : "text-blue-600"}`}>{userData.name[0]}</div>
                       </div>
-
                       <div className="mt-16 text-right">
-                        {isEditingProfile ? (
-                          <div className="space-y-4">
-                            <input type="text" className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'bg-zinc-900 border-white' : 'border-slate-200'}`} value={userData.name} onChange={(e) => setUserData({...userData, name: e.target.value})} />
-                            <textarea className={`w-full p-2 border-2 rounded-lg ${darkMode ? 'bg-zinc-900 border-white' : 'border-slate-200'}`} value={userData.bio} onChange={(e) => setUserData({...userData, bio: e.target.value})} />
-                            <button onClick={() => setIsEditingProfile(false)} className={`w-full py-3 rounded-xl font-black ${darkMode ? "bg-white text-black" : "bg-blue-600 text-white"}`}>حفظ التغييرات</button>
-                          </div>
-                        ) : (
-                          <>
-                            <h3 className="text-3xl font-black mb-2">{userData.name}</h3>
-                            <p className="font-bold opacity-60 mb-6">{selectedMajors[0]}</p>
-                            <p className="text-lg leading-relaxed italic opacity-80 mb-8">"{userData.bio}"</p>
-                            <button onClick={() => setIsEditingProfile(true)} className={`px-8 py-3 rounded-xl font-bold border-2 ${darkMode ? "border-white" : "border-slate-200"}`}>تعديل الملف</button>
-                          </>
-                        )}
+                        <h3 className="text-3xl font-black mb-2">{userData.name}</h3>
+                        <p className="font-bold opacity-60 mb-6">{selectedMajors[0]}</p>
+                        <p className="text-lg leading-relaxed italic opacity-80 mb-8">"{userData.bio}"</p>
+                        <button onClick={() => setIsEditingProfile(!isEditingProfile)} className={`px-8 py-3 rounded-xl font-bold border-2 ${darkMode ? "border-white" : "border-slate-200"}`}>تعديل الملف</button>
                       </div>
                     </div>
                   </div>
@@ -494,10 +433,10 @@ export default function App() {
         {step === 4 && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg z-50">
             <div className={`flex justify-around items-center p-4 rounded-full border-4 shadow-2xl backdrop-blur-md ${darkMode ? "bg-black/80 border-white" : "bg-white/90 border-slate-200"}`}>
-              <button onClick={() => {setView("home"); setActiveChat(null);}} className={`p-3 rounded-full transition-all ${view === "home" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><HomeLogo active={view === "home"} darkMode={darkMode} /></button>
+              <button onClick={() => setView("home")} className={`p-3 rounded-full transition-all ${view === "home" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><HomeLogo active={view === "home"} darkMode={darkMode} /></button>
               <button onClick={() => setView("chat")} className={`p-3 rounded-full transition-all ${view === "chat" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><ChatLogo active={view === "chat"} darkMode={darkMode} /></button>
-              <button onClick={() => {setView("notifications"); setActiveChat(null);}} className={`p-3 rounded-full transition-all ${view === "notifications" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><NotifLogo active={view === "notifications"} darkMode={darkMode} /></button>
-              <button onClick={() => {setView("profile"); setActiveChat(null);}} className={`p-3 rounded-full transition-all ${view === "profile" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><UserLogo active={view === "profile"} darkMode={darkMode} /></button>
+              <button onClick={() => setView("notifications")} className={`p-3 rounded-full transition-all ${view === "notifications" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><NotifLogo active={view === "notifications"} darkMode={darkMode} /></button>
+              <button onClick={() => setView("profile")} className={`p-3 rounded-full transition-all ${view === "profile" ? (darkMode ? "bg-white" : "bg-blue-100") : ""}`}><UserLogo active={view === "profile"} darkMode={darkMode} /></button>
             </div>
           </div>
         )}
