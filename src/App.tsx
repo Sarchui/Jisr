@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState } from "react";
 
 // --- 1. Types ---
 type MajorCategories = { [key: string]: string[] };
@@ -136,14 +136,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [joinStatus, setJoinStatus] = useState<string | null>(null);
 
-  // تم حذف التنبيهات المسببة للخطأ تماماً
   const notifications: Notification[] = [
     { id: 1, text: "طلب جديد للانضمام لمشروعك", type: "join_request", read: false }
   ];
-
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const profileImageInput = useRef<HTMLInputElement>(null);
-  const coverImageInput = useRef<HTMLInputElement>(null);
 
   const [userData, setUserData] = useState({
     name: "سارة الشطيطي",
@@ -420,7 +415,6 @@ export default function App() {
                         <h3 className="text-3xl font-black mb-2">{userData.name}</h3>
                         <p className="font-bold opacity-60 mb-6">{selectedMajors[0]}</p>
                         <p className="text-lg leading-relaxed italic opacity-80 mb-8">"{userData.bio}"</p>
-                        <button onClick={() => setIsEditingProfile(!isEditingProfile)} className={`px-8 py-3 rounded-xl font-bold border-2 ${darkMode ? "border-white" : "border-slate-200"}`}>تعديل الملف</button>
                       </div>
                     </div>
                   </div>
